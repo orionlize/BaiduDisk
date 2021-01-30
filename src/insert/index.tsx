@@ -158,9 +158,22 @@ interface TDProps {
 
 function ThunderDownload(props: TDProps) {
   return <div id='__custom_thunder_dialog' style={{'width': '100%', 'height': '100vh', 'background': 'rgba(0, 0, 0, 0.5)', 'zIndex': 100, 'position': 'fixed', 'top': '0', 'display': 'flex', 'alignItems': 'center', 'justifyContent': 'center'}}>
-    <script src='//open.thunderurl.com/thunder-link.js' />
-    <a href={props.url} onLoad={() => {
-    }}>迅雷下载</a>
+    <div style={{'width': '200px', 'height': '80px', 'background': 'white', 'display': 'flex', 'alignItems': 'center', 'justifyContent': 'center', 'flexFlow': 'column'}}>
+      <div style={{'width': '100%', 'height': '30px', 'display': 'flex'}}>
+        <span style={{'flex': 0.95, 'fontSize': '18px', 'textAlign': 'end'}}>x</span>
+      </div>
+      <a href={`thunder://${base64encode(`AA${props.url}ZZ`)}`} onLoad={() => {
+      }}>迅雷下载</a>
+      <a href='javascript:;' onClick={() => {
+        const range = document.createRange();
+        range.selectNodeContents(document.querySelector('#__custom_address_str')!);
+        const selection = document.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+        document.execCommand('Copy');
+      }}>复制地址</a>
+      <div id='__custom_address_str' style={{'position': 'absolute', 'opacity': 0, 'zIndex': -1}}>{props.url}</div>
+    </div>
   </div>;
 }
 
