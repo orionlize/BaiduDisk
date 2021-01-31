@@ -1,3 +1,4 @@
+// openYunGuanjiaByScheme
 /* eslint-disable max-len */
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -13,7 +14,7 @@ const getDirectLink = (vcode?: string, code?: string, success?: (dlink: string) 
   const getDownloadUrl = `https://pan.baidu.com/api/sharedownload?sign=${data.sign}&timestamp=${data.timestamp}&channel=chunlei&web=1&app_id=${data.file_list.list[0].app_id}&bdstoken=${data.bdstoken}&logid=${base64encode(getCookie('BAIDUID') as string)}&clienttype=0`;
 
   const formData = new FormData();
-  formData.append('encrypt', '0');
+  formData.append('encrypt', data.expired_type.toString());
   formData.append('extra', JSON.stringify({'sekey': decodeURIComponent(getCookie('BDCLND') as string)}));
   formData.append('product', 'share');
   formData.append('uk', data.uk.toString());
@@ -130,7 +131,7 @@ function VCodeDialog(props: VCDProps) {
           getDirectLink(vcode, code, (dlink: string) => {
             setShow(false);
             // 处理直链的真实地址
-            chrome.runtime.sendMessage('melpoiihllhppniaookfigdhihgmljbo', dlink, {}, () => {});
+            chrome.runtime.sendMessage(chrome.runtime.id, dlink, {}, () => {});
           }, (_imgUrl, _vcode) => {
             setImageUrl(_imgUrl);
             setVCode(_vcode);
@@ -154,27 +155,43 @@ function VCodeDialog(props: VCDProps) {
 
 interface TDProps {
   url: string
+  show: boolean
+  filename: string
 }
 
 function ThunderDownload(props: TDProps) {
-  return <div id='__custom_thunder_dialog' style={{'width': '100%', 'height': '100vh', 'background': 'rgba(0, 0, 0, 0.5)', 'zIndex': 100, 'position': 'fixed', 'top': '0', 'display': 'flex', 'alignItems': 'center', 'justifyContent': 'center'}}>
-    <div style={{'width': '200px', 'height': '80px', 'background': 'white', 'display': 'flex', 'alignItems': 'center', 'justifyContent': 'center', 'flexFlow': 'column'}}>
-      <div style={{'width': '100%', 'height': '30px', 'display': 'flex'}}>
-        <span style={{'flex': 0.95, 'fontSize': '18px', 'textAlign': 'end'}}>x</span>
+  const [show, setShow] = React.useState(false);
+
+  React.useEffect(() => {
+    setShow(props.show);
+  }, [props]);
+
+  return show ? <div id='__custom_thunder_dialog' style={{'width': '100%', 'height': '100vh', 'background': 'rgba(0, 0, 0, 0.5)', 'zIndex': 100, 'position': 'fixed', 'top': '0', 'display': 'flex', 'alignItems': 'center', 'justifyContent': 'center'}}>
+    <div style={{'width': '400px', 'height': '160px', 'background': 'white', 'display': 'flex', 'alignItems': 'center', 'justifyContent': 'center', 'flexFlow': 'column', 'borderRadius': 10}}>
+      <div style={{'width': '100%', 'height': '62px', 'display': 'flex', 'justifyContent': 'space-between', 'alignItems': 'center', 'boxSizing': 'border-box', 'padding': '16px'}}>
+        <div style={{'fontSize': '18px', 'width': '350px', 'overflow': 'hidden', 'textOverflow': 'ellipsis', 'WebkitLineClamp': 1, 'wordBreak': 'break-all'}}>{props.filename}</div>
+        <button style={{'fontSize': '28px', 'background': 'white', 'border': 'none', 'width': '30px', 'lineHeight': '30px'}} onClick={() => {
+          setShow(false);
+        }} >×</button>
       </div>
-      <a href={`thunder://${base64encode(`AA${props.url}ZZ`)}`} onLoad={() => {
-      }}>迅雷下载</a>
-      <a href='javascript:;' onClick={() => {
-        const range = document.createRange();
-        range.selectNodeContents(document.querySelector('#__custom_address_str')!);
-        const selection = document.getSelection();
-        selection?.removeAllRanges();
-        selection?.addRange(range);
-        document.execCommand('Copy');
-      }}>复制地址</a>
+      <div style={{'display': 'flex', 'width': '400px', 'height': '98px', 'alignItems': 'center', 'justifyContent': 'space-between', 'marginTop': '30px'}}>
+        <a style={{'fontSize': '24px', 'width': '50%', 'textAlign': 'center'}} href={`thunder://${base64encode(`AA${props.url}ZZ`)}`} onClick={() => {
+          setShow(false);
+        }}>迅雷下载</a>
+        <a style={{'fontSize': '24px', 'width': '50%', 'textAlign': 'center'}} href='javascript:;' onClick={() => {
+          const range = document.createRange();
+          range.selectNodeContents(document.querySelector('#__custom_address_str')!);
+          const selection = document.getSelection();
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+          document.execCommand('Copy');
+          setShow(false);
+        }}>复制地址</a>
+      </div>
       <div id='__custom_address_str' style={{'position': 'absolute', 'opacity': 0, 'zIndex': -1}}>{props.url}</div>
     </div>
-  </div>;
+  </div> : null
+  ;
 }
 
 const button = document.createElement('a');
@@ -195,7 +212,9 @@ const onClick = () => {
     selects.push(parseInt(dd!.attributes!.getNamedItem('_position')!.value));
   }
 
-  getDirectLink();
+  getDirectLink(undefined, undefined, (dlink: string) => {
+    chrome.runtime.sendMessage(chrome.runtime.id, dlink, {}, () => {});
+  });
   console.log(selects);
 };
 
@@ -205,9 +224,11 @@ ReactDOM.render(<DLinkButton />, button);
 
 
 chrome.runtime.onMessage.addListener((e) => {
+  const data = JSON.parse(document.getElementById('direct_download_id')?.getAttribute('yun-data')!);
+
   const div = document.createElement('div');
   document.getElementById('layoutApp')?.appendChild(div);
-  ReactDOM.render(<ThunderDownload url={e} />, div);
+  ReactDOM.render(<ThunderDownload filename={data.file_list.list[0].server_filename} show url={e} />, div);
 
   return true;
 });

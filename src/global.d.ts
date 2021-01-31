@@ -12,6 +12,7 @@ declare namespace chrome {
       function addListener(listener: (message: any, sender: any, sendResponse: any) => void)
     }
     function sendMessage(extensionId?: string, message: any, options: object, responseCallback: Function)
+    const id: string;
   }
 
   declare namespace tabs {
