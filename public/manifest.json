@@ -36,7 +36,10 @@
       "js": [
         "./static/js/insert.js"
       ],
-      "run_at": "document_end"
+      "run_at": "document_end",
+      "css": [
+        "./static/css/insert.css"
+      ]
     },
     {
       "matches": [
@@ -45,7 +48,8 @@
       "js": [
         "./static/js/insert_network.js"
       ],
-      "run_at": "document_start"
+      "run_at": "document_start",
+      "css": []
     }
   ]
 }
