@@ -13,7 +13,7 @@ function responseCallBack() {
       ;
     };
   }
-  // console.log(list)
+  // (list)
 }
 
 function openByReplace(originalFunction: any) {
@@ -40,8 +40,6 @@ function sendByReplace(originalFunction: any) {
     return originalFunction.apply(this, arguments);
   };
 }
-
-console.log(':) 注入成功', document);
 
 // @ts-ignore
 XMLHttpRequest.prototype.open = openByReplace(XMLHttpRequest.prototype.open);

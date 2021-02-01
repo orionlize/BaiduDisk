@@ -2,7 +2,7 @@ import React from 'react';
 
 function App() {
   return <div>
-    Hello Chrome
+    百度云直链插件
   </div>;
 }
 

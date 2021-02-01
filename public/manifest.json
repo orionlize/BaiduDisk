@@ -1,15 +1,22 @@
 {
-  "name": "Chrome Plugin",
+  "name": "百度云直链",
   "version": "0.0.1",
   "manifest_version": 2,
-  "description": "chrome集成React 开发插件",
+  "description": "百度云分享链接直链下载",
+  "icons": {
+    "16": "app.png",
+    "48": "app.png",
+    "128": "app.png"
+  },
   "permissions": [
     "webRequest",
     "webRequestBlocking",
-    "*://*/"
+    "*://pan.baidu.com/",
+    "*://d.pcs.baidu.com/file/",
+    "*://*.baidupcs.com/file/"
   ],
   "page_action": {
-    "default": "Chrome Plugin",
+    "default": "百度云直链插件",
     "default_popup": "index.html"
   },
   "web_accessible_resources": [

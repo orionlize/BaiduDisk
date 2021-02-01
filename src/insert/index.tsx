@@ -20,7 +20,6 @@ const getDirectLink = (selects: number[], vcode?: string, code?: string, success
   _selects.map((item) => {
     list.push(data.file_list.list[item].fs_id);
   });
-  console.log(data);
   const getDownloadUrl = `https://pan.baidu.com/api/sharedownload?sign=${data.sign}&timestamp=${data.timestamp}&channel=chunlei&web=1&app_id=${data.file_list.list[0].app_id}&bdstoken=${data.bdstoken}&logid=${base64encode(getCookie('BAIDUID') as string)}&clienttype=0`;
 
   const formData = new FormData();
@@ -184,7 +183,7 @@ function ThunderDownload(props: TDProps) {
       }}>迅雷下载</a>
       <a className='__dialog-cell-a' href='javascript:;' onClick={() => {
         const range = document.createRange();
-        range.selectNodeContents(document.querySelector('#__custom_address_str')!);
+        range.selectNodeContents(document.querySelector(`#__custom_address_str_${index}`)!);
         const selection = document.getSelection();
         selection?.removeAllRanges();
         selection?.addRange(range);
@@ -228,7 +227,6 @@ const onClick = () => {
   getDirectLink(selects, undefined, undefined, (list) => {
     chrome.runtime.sendMessage(chrome.runtime.id, list, {}, () => {});
   });
-  console.log(selects);
 };
 
 button.onclick = onClick;
@@ -237,8 +235,6 @@ ReactDOM.render(<DLinkButton />, button);
 
 
 chrome.runtime.onMessage.addListener((e) => {
-  console.log(e);
-
   const div = document.createElement('div');
   document.getElementById('layoutApp')?.appendChild(div);
   ReactDOM.render(<ThunderDownload list={e} show />, div);
